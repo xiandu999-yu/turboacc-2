@@ -211,6 +211,9 @@ static inline void fast_classifier_incr_exceptions(fast_classifier_exception_t e
 	spin_unlock_bh(&sc->lock);
 }
 
+// 添加函数原型声明来修复第一个错误
+int fast_classifier_recv(struct sk_buff *skb);
+
 /*
  * fast_classifier_recv()
  *	Handle packet receives.
@@ -1489,7 +1492,8 @@ static void fast_classifier_sync_rule(struct sfe_connection_sync *sis)
 		nlstats.tx_packets = 0;
 		nlstats.tx_bytes = 0;
 
-		if (sis->src_dev && IFF_EBRIDGE &&
+		// 修复第1492行的错误：使用正确的布尔表达式
+		if (sis->src_dev && (sis->src_dev->flags & IFF_EBRIDGE) &&
 		    (sis->src_new_packet_count || sis->src_new_byte_count)) {
 			nlstats.rx_packets = sis->src_new_packet_count;
 			nlstats.rx_bytes = sis->src_new_byte_count;
@@ -1497,7 +1501,8 @@ static void fast_classifier_sync_rule(struct sfe_connection_sync *sis)
 			br_dev_update_stats(sis->src_dev, &nlstats);
 			spin_unlock_bh(&sfe_connections_lock);
 		}
-		if (sis->dest_dev && IFF_EBRIDGE &&
+		// 修复第1500行的错误：使用正确的布尔表达式
+		if (sis->dest_dev && (sis->dest_dev->flags & IFF_EBRIDGE) &&
 		    (sis->dest_new_packet_count || sis->dest_new_byte_count)) {
 			nlstats.rx_packets = sis->dest_new_packet_count;
 			nlstats.rx_bytes = sis->dest_new_byte_count;
@@ -2005,4 +2010,3 @@ module_exit(fast_classifier_exit)
 
 MODULE_DESCRIPTION("Shortcut Forwarding Engine - Connection Manager");
 MODULE_LICENSE("Dual BSD/GPL");
-
